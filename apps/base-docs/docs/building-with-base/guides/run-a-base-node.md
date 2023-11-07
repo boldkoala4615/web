@@ -89,10 +89,11 @@ wget https://base-goerli-archive-snapshots.s3.us-east-1.amazonaws.com/$(curl htt
 You can monitor the progress of your sync with:
 
 ```bash
-echo Latest synced block behind by: $((($(date +%s)-$( \
-  curl -d '{"id":0,"jsonrpc":"2.0","method":"optimism_syncStatus"}' \
-  -H "Content-Type: application/json" http://localhost:7545 | \
-  jq -r .result.unsafe_l2.timestamp))/60)) minutes
+command -v jq  &> /dev/null || { echo "jq is not installed" 1>&2 ; }
+echo Latest synced block behind by: \
+$((($( date +%s )-\
+$( curl -s -d '{"id":0,"jsonrpc":"2.0","method":"optimism_syncStatus"}' -H "Content-Type: application/json" http://localhost:7545 |
+   jq -r .result.unsafe_l2.timestamp))/60)) minutes
 ```
 
 You'll also know that the sync hasn't completed if you get `Error: nonce has already been used` if you try to deploy using your node.
